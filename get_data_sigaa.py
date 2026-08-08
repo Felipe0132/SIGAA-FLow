@@ -1,20 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-from dotenv import load_dotenv
 import os
 
-load_dotenv()
-
-usuario = os.getenv("SIGAA_USUARIO")
-senha = os.getenv("SIGAA_SENHA")
-
 # DADOS LOGIN
-
+"""
 dados_login_exemplo = {
     'user.login': usuario,
     'user.senha': senha,
 }
+"""
 
 def teste_login(dados_login):
     session = requests.Session()
