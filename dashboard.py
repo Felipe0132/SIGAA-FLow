@@ -1,6 +1,7 @@
 import get_data_sigaa as get_sigaa
 import requests
 import streamlit as st
+import math
 
 st.set_page_config(page_title="SIGAA Dashboard", page_icon="📚", layout="wide")
 
@@ -25,7 +26,7 @@ try:
 
             total_aulas = materia["total_aulas"]
             total_faltas = materia["total_faltas"]
-            limite_faltas = float(total_aulas * 0.25)
+            limite_faltas = math.floor(float(total_aulas * 0.25))
             restantes = limite_faltas - total_faltas
             percentual_usado = total_faltas / limite_faltas if limite_faltas else 0
 

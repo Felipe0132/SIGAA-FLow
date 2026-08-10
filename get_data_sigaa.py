@@ -101,7 +101,7 @@ def get_options_params(materia, url_discente, session):
 
     return {"url_atual":url_ava, "view_state":view_state_notas, "option":options, "nome":nome_materia}
 
-def get_notas(options_params, session):
+def get_notas(options_params, session, nome):
     notas = options_params["option"][2]
     onclick_code = notas['onclick']
 
@@ -122,15 +122,17 @@ def get_notas(options_params, session):
     view_state_freq = form_menu_notas.find('input', {'name': 'javax.faces.ViewState'})['value']
     url_notas = res_notas.url
     
-    relatorio_notas = soup_notas.find('div', {'class':'relatorio'})
+    relatorio_notas = soup_notas.find('div', {'class':'tabelaRelatorio'})
     notas_atual = 0
     if relatorio_notas:
-        linha_par = relatorio_notas.find('tr', {'class':'linhaPar'})
+        td_nota = relatorio_notas.find('td', string=re.compile(re.escape(nome), re.IGNORECASE))
+        if td_nota:
+            linha_nota = td_nota.find_parent('tr')
 
-        if linha_par:
-            colunas = relatorio_notas.find_all('td')
-            if len(colunas) >= 3:
-                notas_atual = colunas[-3].text.strip()
+            if linha_nota:
+                colunas = linha_nota.find_all('td')
+                if len(colunas) >= 3:
+                    notas_atual = colunas[-3].text.strip()
 
     try:
         options_params["view_state"] = view_state_freq
@@ -182,12 +184,12 @@ def get_freq(options_params, session):
 
     return {"total_aulas":total_aulas, "faltas":num_faltas}
                     
-def get_datas_by_materia(materia, url_discente, session):
+def get_datas_by_materia(materia, url_discente, session, nome):
     options_params = get_options_params(materia, url_discente, session)
     
     # PAGINAS NOTAS
     
-    notas_atual = get_notas(options_params, session)
+    notas_atual = get_notas(options_params, session, nome)
 
     # PAGINA FREQUENCIA
 
@@ -197,7 +199,7 @@ def get_datas_by_materia(materia, url_discente, session):
 
     return {options_params["nome"]:{"total_aulas":total_aulas, "total_faltas":num_faltas, "notas_atual":notas_atual}}
 
-def get_nome_saldo(url_saldo, session):
+def get_saldo(url_saldo, session):
     resposta = session.get(url_saldo)
 
     soup = BeautifulSoup(resposta.text, 'html.parser')
@@ -205,11 +207,10 @@ def get_nome_saldo(url_saldo, session):
     tabela = soup.find('tbody')
 
     dados = tabela.find_all('tr')
-    nome = dados[0].find('td').text
     saldo = dados[2].find_all('td')
     saldo = re.search(r'\d+', saldo[1].text).group()
 
-    return {"nome":nome, "saldo":saldo}
+    return saldo
 
 def datas_sigaa(dados_login):
     session = requests.Session()
@@ -234,6 +235,8 @@ def datas_sigaa(dados_login):
         print("Falha no login")
         return data_materias
 
+    nome = resposta_login.find('p', {'class':'usuario'}).span.text
+
     tabela_materias = get_materias(url_discente, session)
 
     if not tabela_materias:
@@ -248,13 +251,13 @@ def datas_sigaa(dados_login):
             <a href="#" onclick="var a=function(){return prevenirDuploClique();};var b=function(){if(typeof jsfcljs == 'function'){jsfcljs(document.getElementById('form_acessarTurmaVirtual'),{'form_acessarTurmaVirtual:j_id_jsp_161879646_442':'form_acessarTurmaVirtual:j_id_jsp_161879646_442','frontEndIdTurma':'53B7AE975737A3577CDB50EF0D262AD76053847F'},'');}return false};return (a()==false) ? false : b();">ALGORITMOS E ESTRUTURAS DE DADOS II</a><input id="javax.faces.ViewState" name="javax.faces.ViewState" type="hidden" value="j_id2"/>
             </form>
         """
-        data_materias.update(get_datas_by_materia(materia, url_discente, session))
+        data_materias.update(get_datas_by_materia(materia, url_discente, session, nome))
 
-    nome_saldo = get_nome_saldo(url_saldo, session)
+    saldo = get_saldo(url_saldo, session)
 
     return {
-            "nome":nome_saldo["nome"],
-            "saldo":nome_saldo["saldo"],
+            "nome":nome,
+            "saldo":saldo,
             "data_materias":data_materias
             }
 
