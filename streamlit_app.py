@@ -3,6 +3,25 @@ import streamlit as st
 
 st.set_page_config(page_title="SIGAA Dashboard", page_icon="📚", layout="wide")
 
+CAMINHO_IMAGEM_NOTAS = "assets/images/padrao_notas.png"
+CAMINHO_IMAGEM_FALTAS = "assets/images/padrao_frequencia.png"
+
+@st.dialog("📋 Guia de Padrão do SIGAA")
+def exibir_modal_instrucoes():
+    st.write(
+        "Certifique-se de que a estrutura das páginas no seu SIGAA corresponde ao padrão abaixo para que o sistema extraia os dados corretamente:"
+    )
+
+    st.subheader("1. Tela de Notas e Situação")
+    st.caption("Deve exibir o nome do aluno e o resultado final da disciplina.")
+    st.image(CAMINHO_IMAGEM_NOTAS, use_container_width=True)
+
+    st.divider()
+
+    st.subheader("2. Tela de Diário de Classe / Frequência")
+    st.caption("Deve conter a tabela detalhada com as presenças e faltas por data.")
+    st.image(CAMINHO_IMAGEM_FALTAS, use_container_width=True)
+
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
@@ -29,16 +48,21 @@ def login():
             enviado = st.form_submit_button("Enviar", use_container_width=True)
 
         if enviado:
-            st.session_state.usuario = usuario
-            st.session_state.senha = senha
             dados_login = {'user.login': usuario, 'user.senha': senha}
 
             with st.spinner("Verificando login..."):
+                st.session_state.usuario = usuario
+                st.session_state.senha = senha
+                
                 if get_sigaa.teste_login(dados_login):
                     st.session_state.logged_in = True
                     st.rerun()
                 else:
                     st.error("Login inválido!")
+
+    st.write("")
+    if st.button("Guia", help="Ver padrao esperado do SIGAA"):
+        exibir_modal_instrucoes()
 
 def logout():
     if st.button("Log out"):
