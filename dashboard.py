@@ -1,4 +1,4 @@
-import get_data_sigaa as get_sigaa
+import src.services.sigaa_service as sigaa_service
 import requests
 import streamlit as st
 import math
@@ -34,7 +34,7 @@ dados_login ={
 try:
     if "dados_sigaa" not in st.session_state:
         with st.spinner("Buscando dados do SIGAA..."):
-            st.session_state.dados_sigaa = get_sigaa.datas_sigaa(dados_login)
+            st.session_state.dados_sigaa = sigaa_service.datas_sigaa(dados_login)
 
     dados = st.session_state.dados_sigaa
 

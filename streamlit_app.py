@@ -1,4 +1,4 @@
-import get_data_sigaa as get_sigaa
+import src.core.client as client
 import streamlit as st
 
 st.set_page_config(page_title="SIGAA Dashboard", page_icon="📚", layout="wide")
@@ -54,7 +54,7 @@ def login():
                 st.session_state.usuario = usuario
                 st.session_state.senha = senha
                 
-                if get_sigaa.teste_login(dados_login):
+                if client.teste_login(dados_login):
                     st.session_state.logged_in = True
                     st.rerun()
                 else:
