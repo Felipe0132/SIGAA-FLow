@@ -10,6 +10,6 @@ def get_saldo(url_saldo, session):
 
     dados = tabela.find_all('tr')
     saldo = dados[2].find_all('td')
-    saldo = re.search(r'\d+', saldo[1].text).group()
+    saldo = re.search(r'-?\d+', saldo[1].text).group()
 
     return saldo
