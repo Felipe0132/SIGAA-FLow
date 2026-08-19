@@ -47,7 +47,9 @@ try:
     with col_header:
         nome_limpo = " ".join(nome.split())
         st.title(f"Ola {nome_limpo}!")
-        st.caption(f"Saldo de recarga RU: **{saldo}**")
+        
+        valor = int(saldo)
+        st.write(f"Saldo de recarga RU:  {f':red[**{valor}**]' if valor <= 0 else f'**{valor}**'}")
 
     with col_botoes:
         st.write("")
