@@ -18,9 +18,10 @@ def get_freq(options_params, session):
     res_frequencia = session.post(options_params["url_atual"], data=payload_frequencia)
     soup_frequencia = BeautifulSoup(res_frequencia.text, 'html.parser')
 
-    total_aulas = soup_frequencia.find('div', {'class':'botoes-show'})
-    if total_aulas:
-        match = re.search(r'CH do Componente:\s*(\d+)', total_aulas.text, re.IGNORECASE) # Pega o que vem depois CH do Componentes, somente a parte do numero
+    total_aulas = 0
+    div_botoes = soup_frequencia.find('div', {'class':'botoes-show'})
+    if div_botoes:
+        match = re.search(r'CH do Componente:\s*(\d+)', div_botoes.text, re.IGNORECASE) # Pega o que vem depois CH do Componentes, somente a parte do numero
 
         if match:
             total_aulas = int(match.group(1))
