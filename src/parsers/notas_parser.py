@@ -23,7 +23,7 @@ def get_notas(options_params, session, nome):
     url_notas = res_notas.url
     
     relatorio_notas = soup_notas.find('div', {'class':'tabelaRelatorio'})
-    notas_atual = 0
+    notas_atual = None
     if relatorio_notas:
         td_nota = relatorio_notas.find('td', string=re.compile(re.escape(nome), re.IGNORECASE))
         if td_nota:
@@ -32,7 +32,11 @@ def get_notas(options_params, session, nome):
             if linha_nota:
                 colunas = linha_nota.find_all('td')
                 if len(colunas) >= 3:
-                    notas_atual = colunas[-3].text.strip()
+                    raw = colunas[-3].text.strip().replace(',', '.')
+                    try:
+                        notas_atual = float(raw)
+                    except ValueError:
+                        notas_atual = None
 
     try:
         options_params["view_state"] = view_state_freq
