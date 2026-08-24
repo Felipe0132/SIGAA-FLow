@@ -1,7 +1,10 @@
 from bs4 import BeautifulSoup
 import re
+import datetime
 
 def get_tarefas(options_params, session):
+    data_atual = datetime.datetime.now()
+    
     tarefas = options_params["option"][3]
     
     onclick_code = tarefas['onclick']
@@ -28,10 +31,12 @@ def get_tarefas(options_params, session):
         if len(td_tarefas) >= 3:
             tarefa_nome = td_tarefas[1].text.strip()
             tarefa_data = td_tarefas[2].text.strip()
-            tarefa_data = re.search(r'de\s+(.+)', tarefa_data).group(1)
+            tarefa_data = re.search(r'\ba\s+(\d{2}/\d{2}/\d{4} às \d{2}h\d{2})', tarefa_data).group(1)
 
             tarefa_enviada = bool(tr_tarefas.find('a', {'title':'Visualizar Tarefa Enviada/Corrigida'}))
 
-            tarefas[tarefa_nome] = [tarefa_data, tarefa_enviada]
+            data_formatada = datetime.datetime.strptime(tarefa_data, "%d/%m/%Y às %Hh%M")
+            if data_atual < data_formatada:
+                tarefas[tarefa_nome] = [tarefa_data, tarefa_enviada]
 
     return tarefas
