@@ -109,7 +109,7 @@ try:
                     col_tarefa, col_data, col_status = st.columns([3, 2, 1])
                     with col_tarefa:
                         st.markdown(
-                            f"<div style='background-color:{cor_fundo}; border-left: 3px solid {cor_borda}; padding: 6px 10px; border-radius: 4px; color:{cor_texto};'>🔹 {nome_tarefa}</div>",
+                            f"<div style='background-color:{cor_fundo}; border-left: 3px solid {cor_borda}; padding: 6px 10px; border-radius: 4px; color:{cor_texto};'>{nome_tarefa}</div>",
                             unsafe_allow_html=True
                         )
                     with col_data:
