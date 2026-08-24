@@ -32,6 +32,10 @@ def get_options_params(materia, url_discente, session):
     form_menu = soup.find('form', id='formMenu')
     view_state_notas = form_menu.find('input', {'name': 'javax.faces.ViewState'})['value']
     
-    options = soup.find_all('td', {'class':'rich-panelbar-content'})[1].find_all('a')
+    options_nota_freq = soup.find_all('td', {'class':'rich-panelbar-content'})[1].find_all('a')
+    options3 = soup.find_all('td', {'class':'rich-panelbar-content'})[3].find_all('a')
+    options_tarefas = options3[2]
+
+    options = options_nota_freq + [options_tarefas]
 
     return {"url_atual":url_ava, "view_state":view_state_notas, "option":options, "nome":nome_materia}
