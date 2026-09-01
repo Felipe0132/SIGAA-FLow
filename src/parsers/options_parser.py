@@ -33,12 +33,35 @@ def get_options_params(materia, url_discente, session):
     if not form_menu:
         return None
 
-    view_state_notas = form_menu.find('input', {'name': 'javax.faces.ViewState'})['value']
-    
+    # O jsfcljs no browser submete o form inteiro, nao so o botao clicado.
+    # Por isso, capturamos todos os <input> do formMenu aqui,
+    # para que os parsers consigam replicar exatamente o que o browser envia.
+    form_inputs = {}
+    for inp in form_menu.find_all('input'): # Dos os inputs
+        name = inp.get('name')           # nome do campo (ex: 'javax.faces.ViewState')
+        value = inp.get('value', '')     # valor do campo (pode ser vazio)
+        if name:
+            form_inputs[name] = value    # salva {nome: valor} para uso nos payloads
+
+    view_state_notas = form_inputs.get('javax.faces.ViewState', '') # extrai o ViewState do dict
+
+    # O JavaScript do RichFaces altera o form antes de enviar (Python nao roda JS, entao forjamos isso):
+    # 1. Ele apaga o valor do _69 (tracker do painel ativo).
+    # 2. Ele cria dinamicamente o _92 (vazio), que nem existe no HTML original.
+    # O Regex acha a base variavel do ID (ex: 311393315) para replicar essa exata estrutura.
+    for key in list(form_inputs.keys()):
+        m = re.match(r'(formMenu:j_id_jsp_\d+)_69$', key)
+        if m:
+            base = m.group(1)
+            form_inputs[key] = ''           # 1. Zera o _69 (imita JS apagando valor)
+            form_inputs[f'{base}_92'] = ''  # 2. Adiciona _92 vazio (imita JS criando input fantasma)
+            break
+
+
     options_nota_freq = soup.find_all('td', {'class':'rich-panelbar-content'})[1].find_all('a')
     options3 = soup.find_all('td', {'class':'rich-panelbar-content'})[3].find_all('a')
     options_tarefas = options3[2]
 
     options = options_nota_freq + [options_tarefas]
 
-    return {"url_atual":url_ava, "view_state":view_state_notas, "option":options, "nome":nome_materia}
+    return {"url_atual":url_ava, "view_state":view_state_notas, "form_inputs":form_inputs, "option":options, "nome":nome_materia}
