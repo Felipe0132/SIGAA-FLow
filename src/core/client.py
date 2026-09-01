@@ -37,16 +37,19 @@ def teste_login(dados_login):
     return soup
 
 def logar(url_login, dados_login, session):
-    resposta = session.get(url_login) # Resposta do get da URL
+    resposta = session.get(url_login)
 
-    soup = BeautifulSoup(resposta.text, 'html.parser') # HTML puro
+    soup = BeautifulSoup(resposta.text, 'html.parser')
 
-    form_login = soup.find('form', {'name': 'loginForm'}) # Procura o primeiro elemento que eh um form loginForm
-    action_url = form_login['action'] # Busca a action, o proximo caminho
+    form_login = soup.find('form', {'name': 'loginForm'})
+    if not form_login:
+        return False
 
-    url_login_completa = f"https://sig.cefetmg.br{action_url}" # URL com a acao
+    action_url = form_login['action']
 
-    resposta = session.post(url_login_completa, data=dados_login) # Coloca os dados do login
+    url_login_completa = f"https://sig.cefetmg.br{action_url}"
+
+    resposta = session.post(url_login_completa, data=dados_login)
 
     soup = BeautifulSoup(resposta.text, 'html.parser')
 

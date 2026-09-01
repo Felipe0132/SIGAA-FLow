@@ -30,6 +30,9 @@ def get_options_params(materia, url_discente, session):
     url_ava = res_materia.url
     
     form_menu = soup.find('form', id='formMenu')
+    if not form_menu:
+        return None
+
     view_state_notas = form_menu.find('input', {'name': 'javax.faces.ViewState'})['value']
     
     options_nota_freq = soup.find_all('td', {'class':'rich-panelbar-content'})[1].find_all('a')

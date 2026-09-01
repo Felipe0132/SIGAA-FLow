@@ -12,4 +12,7 @@ def get_materias(url_discente, session):
     return False
 
 def get_nome(resposta_login):
-    return resposta_login.find('p', {'class':'usuario'}).span.text
+    p = resposta_login.find('p', {'class':'usuario'})
+    if not p or not p.span:
+        return 'Estudante'
+    return p.span.text

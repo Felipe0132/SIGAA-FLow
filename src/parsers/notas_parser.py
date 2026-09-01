@@ -10,7 +10,6 @@ def get_notas(options_params, session, nome):
 
     payload_notas = {
         'formMenu': 'formMenu',
-        'formMenu:j_id_jsp': 'formMenu:j_id_jsp',
         id_botao_notas: id_botao_notas,
         'javax.faces.ViewState': options_params["view_state"]
     }
@@ -18,12 +17,16 @@ def get_notas(options_params, session, nome):
     res_notas = session.post(options_params["url_atual"], data=payload_notas)
     soup_notas = BeautifulSoup(res_notas.text, 'html.parser')
 
-    form_menu_notas = soup_notas.find('form', id='formMenu')
-    view_state_freq = form_menu_notas.find('input', {'name': 'javax.faces.ViewState'})['value']
     url_notas = res_notas.url
+    form_menu_notas = soup_notas.find('form', id='formMenu')
+    if not form_menu_notas:
+        return None
+
+    view_state_freq = form_menu_notas.find('input', {'name': 'javax.faces.ViewState'})['value']
     
     relatorio_notas = soup_notas.find('div', {'class':'tabelaRelatorio'})
     notas_atual = None
+    
     if relatorio_notas:
         td_nota = relatorio_notas.find('td', string=re.compile(re.escape(nome), re.IGNORECASE))
         if td_nota:

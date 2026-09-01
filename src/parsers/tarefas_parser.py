@@ -27,10 +27,19 @@ def get_tarefas(options_params, session):
 
     for tarefas_disp_child in tarefas_disp_childs:
         tr_tarefas = tarefas_disp_child.find_parent('tr')
+        if not tr_tarefas:
+            continue
+
         td_tarefas = tr_tarefas.find_all('td')
         if len(td_tarefas) >= 3:
-            tarefa_nome = td_tarefas[1].text.strip()
-            tarefa_data = td_tarefas[2].text.strip()
+            td_nome = td_tarefas[1]
+            td_data = td_tarefas[2]
+
+            if not td_nome or not td_data:
+                continue
+
+            tarefa_nome = td_nome.get_text(strip=True)
+            tarefa_data = td_data.get_text(strip=True)
             tarefa_data = re.search(r'\ba\s+(\d{2}/\d{2}/\d{4} às \d{2}h\d{2})', tarefa_data).group(1)
 
             tarefa_enviada = bool(tr_tarefas.find('a', {'title':'Visualizar Tarefa Enviada/Corrigida'}))
