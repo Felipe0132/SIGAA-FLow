@@ -73,9 +73,12 @@ try:
             restantes = limite_faltas - total_faltas
             percentual_usado = total_faltas / limite_faltas if limite_faltas else 0
 
+            nota_total = materia["notas_atual"]
+            nota_display = f"{nota_total:.2f}" if isinstance(nota_total, (int, float)) else (str(nota_total) if nota_total is not None else "-")
+
             col1, col2, col3 = st.columns(3)
             col1.metric("CH total", total_aulas)
-            col2.metric("Nota total", materia["notas_atual"])
+            col2.metric("Nota total", nota_display)
             col3.metric(
                 "Faltas restantes",
                 f"{restantes} aulas",

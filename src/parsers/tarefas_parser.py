@@ -45,7 +45,7 @@ def get_tarefas(options_params, session):
             tarefa_enviada = bool(tr_tarefas.find('a', {'title':'Visualizar Tarefa Enviada/Corrigida'}))
 
             data_formatada = datetime.datetime.strptime(tarefa_data, "%d/%m/%Y às %Hh%M")
-            if data_atual < data_formatada:
+            if data_atual <= data_formatada:
                 tarefas[tarefa_nome] = [tarefa_data, tarefa_enviada]
 
     return tarefas
