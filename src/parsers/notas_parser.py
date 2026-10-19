@@ -53,8 +53,8 @@ def get_notas(options_params, session, nome):
             if linha_nota:
                 colunas = linha_nota.find_all('td')
                 notas_atual = 0.0
-                if len(colunas) >= 4:
-                    for i in range(2, len(colunas)-4):
+                if len(colunas) >= 5:
+                    for i in range(2, len(colunas)-5):
                         nota = colunas[i].text.strip().replace(',', '.')
                         if nota:
                             try:
