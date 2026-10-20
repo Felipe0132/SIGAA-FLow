@@ -7,22 +7,22 @@ def get_datas_by_materia(materia, url_discente, session, nome):
     options_params = options_parser.get_options_params(materia, url_discente, session)
     if not options_params:
         return {}
+    
+    # PAGINAS NOTAS
+    
+    notas_atual = notas_parser.get_notas(options_params, session, nome)
 
-    # PAGINA FREQUENCIA (roda no AVA e atualiza o ViewState do formMenu)
+    # PAGINA FREQUENCIA
 
     freq = frequencia_parser.get_freq(options_params, session)
 
     total_aulas = freq["total_aulas"]
     num_faltas = freq["faltas"]
 
-    # PAGINA TAREFAS (roda no AVA e atualiza o ViewState do formMenu)
+    # PAGINA TAREFAS
 
     tarefas = tarefas_parser.get_tarefas(options_params, session)
 
     tarefas_disp = tarefas
-
-    # PAGINAS NOTAS (roda por ultimo pois abre relatorio estatico fora do formMenu do AVA)
-
-    notas_atual = notas_parser.get_notas(options_params, session, nome)
 
     return {options_params["nome"]:{"total_aulas":total_aulas, "total_faltas":num_faltas, "notas_atual":notas_atual, "tarefas":tarefas}}

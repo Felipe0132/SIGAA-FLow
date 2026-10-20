@@ -21,10 +21,16 @@ def get_tarefas(options_params, session):
     res_tarefas = session.post(options_params["url_atual"], data=payload_tarefas)
     soup_tarefas = BeautifulSoup(res_tarefas.text, 'html.parser')
 
+    tarefas_disp_childs = soup_tarefas.find_all('a', {'title':'Enviar tarefa'})
+
     tarefas = {}
 
-    for tr_tarefas in soup_tarefas.find_all('tr'):
-        td_tarefas = tr_tarefas.find_all('td', recursive=False)
+    for tarefas_disp_child in tarefas_disp_childs:
+        tr_tarefas = tarefas_disp_child.find_parent('tr')
+        if not tr_tarefas:
+            continue
+
+        td_tarefas = tr_tarefas.find_all('td')
         if len(td_tarefas) >= 3:
             td_nome = td_tarefas[1]
             td_data = td_tarefas[2]
@@ -32,32 +38,14 @@ def get_tarefas(options_params, session):
             if not td_nome or not td_data:
                 continue
 
-            tarefa_nome = " ".join(td_nome.get_text().split())
-            tarefa_data_texto = " ".join(td_data.get_text().split())
-            match_data = re.search(r'\ba\s+(\d{2}/\d{2}/\d{4}\s+às\s+\d{2}h\d{2})', tarefa_data_texto)
-            if not match_data:
-                continue
-            tarefa_data = match_data.group(1)
+            tarefa_nome = td_nome.get_text(strip=True)
+            tarefa_data = td_data.get_text(strip=True)
+            tarefa_data = re.search(r'\ba\s+(\d{2}/\d{2}/\d{4} às \d{2}h\d{2})', tarefa_data).group(1)
 
-            tarefa_enviada = bool(
-                tr_tarefas.find('a', {'title': re.compile(r'Visualizar Tarefa Enviada/Corrigida', re.IGNORECASE)})
-            )
+            tarefa_enviada = bool(tr_tarefas.find('a', {'title':'Visualizar Tarefa Enviada/Corrigida'}))
 
             data_formatada = datetime.datetime.strptime(tarefa_data, "%d/%m/%Y às %Hh%M")
-            if data_atual <= data_formatada:
-                chave = tarefa_nome
-                contador = 2
-                while chave in tarefas:
-                    chave = f"{tarefa_nome} ({contador})"
-                    contador += 1
-                tarefas[chave] = [tarefa_data, tarefa_enviada]
-
-    # Atualiza o ViewState e URL para o proximo parser (notas_parser)
-    form_menu_tarefas = soup_tarefas.find('form', id='formMenu')
-    if form_menu_tarefas:
-        input_vs = form_menu_tarefas.find('input', {'name': 'javax.faces.ViewState'})
-        if input_vs:
-            options_params["view_state"] = input_vs['value']
-        options_params["url_atual"] = res_tarefas.url
+            if data_atual < data_formatada:
+                tarefas[tarefa_nome] = [tarefa_data, tarefa_enviada]
 
     return tarefas

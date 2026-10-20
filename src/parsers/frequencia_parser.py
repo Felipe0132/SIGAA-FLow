@@ -49,12 +49,4 @@ def get_freq(options_params, session):
                     else: # Quando houver apenas 'Falta'
                         num_faltas += 1
 
-    # Atualiza o ViewState e URL para o proximo parser caso continuemos no AVA (formMenu presente)
-    form_menu_freq = soup_frequencia.find('form', id='formMenu')
-    if form_menu_freq:
-        input_vs = form_menu_freq.find('input', {'name': 'javax.faces.ViewState'})
-        if input_vs:
-            options_params["view_state"] = input_vs['value']
-        options_params["url_atual"] = res_frequencia.url
-
     return {"total_aulas":total_aulas, "faltas":num_faltas}
