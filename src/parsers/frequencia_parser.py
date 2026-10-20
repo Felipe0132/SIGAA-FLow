@@ -22,7 +22,8 @@ def get_freq(options_params, session):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     }
 
-    res_frequencia = session.post(options_params["url_atual"], data=payload_frequencia, headers=headers)
+    post_url = "https://sig.cefetmg.br/sigaa/ava/index.jsf"
+    res_frequencia = session.post(post_url, data=payload_frequencia, headers=headers)
     soup_frequencia = BeautifulSoup(res_frequencia.text, 'html.parser')
 
     total_aulas = 0
@@ -34,19 +35,26 @@ def get_freq(options_params, session):
             total_aulas = int(match.group(1))
 
     num_faltas = 0
-    relacao = soup_frequencia.find('table', {'class':'listing'})
-    if relacao:
+    for relacao in soup_frequencia.find_all('table', {'class':'listing'}):
         linhas = relacao.find_all('tr')
         for linha in linhas:
-            colunas = linha.find_all('td')
+            colunas = linha.find_all('td', recursive=False)
 
             if len(colunas) >= 2: # colunas[0]=Data/Aula, colunas[1]=Situação
-                situacao = colunas[1].text.strip().capitalize()
+                situacao = " ".join(colunas[1].get_text().split()).capitalize()
                 if "falta" in situacao.lower():
                     qtd_faltas = re.search(r'\d+', situacao) # Pega o primeiro inteiro na string (ex: '2 Falta(s)' -> 2)
                     if qtd_faltas:
                         num_faltas += int(qtd_faltas.group())
                     else: # Quando houver apenas 'Falta'
                         num_faltas += 1
+
+    # Atualiza o ViewState e URL para o proximo parser caso continuemos no AVA (formMenu presente)
+    form_menu_freq = soup_frequencia.find('form', id='formMenu')
+    if form_menu_freq:
+        input_vs = form_menu_freq.find('input', {'name': 'javax.faces.ViewState'})
+        if input_vs:
+            options_params["view_state"] = input_vs['value']
+        options_params["url_atual"] = res_frequencia.url
 
     return {"total_aulas":total_aulas, "faltas":num_faltas}

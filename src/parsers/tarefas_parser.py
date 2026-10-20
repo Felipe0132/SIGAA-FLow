@@ -52,4 +52,12 @@ def get_tarefas(options_params, session):
                     contador += 1
                 tarefas[chave] = [tarefa_data, tarefa_enviada]
 
+    # Atualiza o ViewState e URL para o proximo parser (notas_parser)
+    form_menu_tarefas = soup_tarefas.find('form', id='formMenu')
+    if form_menu_tarefas:
+        input_vs = form_menu_tarefas.find('input', {'name': 'javax.faces.ViewState'})
+        if input_vs:
+            options_params["view_state"] = input_vs['value']
+        options_params["url_atual"] = res_tarefas.url
+
     return tarefas
