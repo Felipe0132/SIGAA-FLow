@@ -1,4 +1,5 @@
 import src.core.client as client
+import requests
 import streamlit as st
 
 st.set_page_config(page_title="SIGAA Dashboard", page_icon="📚", layout="wide")
@@ -51,22 +52,30 @@ def login():
             dados_login = {'user.login': usuario, 'user.senha': senha}
 
             with st.spinner("Verificando login..."):
-                st.session_state.usuario = usuario
-                st.session_state.senha = senha
-                
-                if client.teste_login(dados_login):
-                    st.session_state.logged_in = True
-                    st.rerun()
-                else:
-                    st.error("Login inválido!")
+                try:
+                    if client.teste_login(dados_login):
+                        st.session_state.usuario = usuario
+                        st.session_state.senha = senha
+                        st.session_state.logged_in = True
+                        st.rerun()
+                    else:
+                        st.error("Não foi possível validar o login. Confira usuário e senha.")
+                except requests.Timeout:
+                    st.error("O SIGAA demorou para responder. Tente novamente.")
+                except requests.ConnectionError:
+                    st.error("Não foi possível conectar ao SIGAA. Verifique sua internet e tente novamente.")
+                except requests.RequestException:
+                    st.error("O SIGAA retornou uma resposta inesperada. Tente novamente mais tarde.")
 
     st.write("")
     if st.button("Guia", help="Ver padrao esperado do SIGAA"):
         exibir_modal_instrucoes()
 
 def logout():
-    if st.button("Log out"):
-        st.session_state.logged_in = False
+    st.title("Sair")
+    if st.button("Encerrar sessão", type="primary"):
+        for chave in ("logged_in", "usuario", "senha", "dados_sigaa"):
+            st.session_state.pop(chave, None)
         st.rerun()
 
 login_page = st.Page(login, title="Log in", icon=":material/login:")
@@ -77,7 +86,7 @@ dashboard = st.Page(
 )
 
 if st.session_state.logged_in:
-    pg = st.navigation([dashboard])
+    pg = st.navigation([dashboard, logout_page])
 else:
     pg = st.navigation([login_page])
 

@@ -19,6 +19,7 @@ def get_tarefas(options_params, session):
     }
 
     res_tarefas = session.post(options_params["url_atual"], data=payload_tarefas)
+    res_tarefas.raise_for_status()
     soup_tarefas = BeautifulSoup(res_tarefas.text, 'html.parser')
 
     tarefas_disp_childs = soup_tarefas.find_all('a', {'title':'Enviar tarefa'})

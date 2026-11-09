@@ -24,6 +24,7 @@ def get_freq(options_params, session):
 
     post_url = "https://sig.cefetmg.br/sigaa/ava/index.jsf"
     res_frequencia = session.post(post_url, data=payload_frequencia, headers=headers)
+    res_frequencia.raise_for_status()
     soup_frequencia = BeautifulSoup(res_frequencia.text, 'html.parser')
 
     total_aulas = 0

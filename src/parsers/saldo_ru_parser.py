@@ -3,6 +3,7 @@ import re
 
 def get_saldo(url_saldo, session):
     resposta = session.get(url_saldo)
+    resposta.raise_for_status()
 
     soup = BeautifulSoup(resposta.text, 'html.parser')
 

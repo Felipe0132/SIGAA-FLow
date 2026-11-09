@@ -2,7 +2,8 @@ from bs4 import BeautifulSoup
 import re
 
 def get_materias(url_discente, session):
-    resposta = session.get(url_discente) 
+    resposta = session.get(url_discente)
+    resposta.raise_for_status()
     
     soup = BeautifulSoup(resposta.text, 'html.parser')
     

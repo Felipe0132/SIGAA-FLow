@@ -25,6 +25,7 @@ def get_notas(options_params, session, nome):
     # O action do formMenu e sempre /sigaa/ava/index.jsf
     post_url = "https://sig.cefetmg.br/sigaa/ava/index.jsf"
     res_notas = session.post(post_url, data=payload_notas, headers=headers)
+    res_notas.raise_for_status()
 
     soup_notas = BeautifulSoup(res_notas.text, 'html.parser')
 

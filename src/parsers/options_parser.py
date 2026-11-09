@@ -25,6 +25,7 @@ def get_options_params(materia, url_discente, session):
     }
     
     res_materia = session.post(url_discente, data=payload_materia)
+    res_materia.raise_for_status()
     soup = BeautifulSoup(res_materia.text, 'html.parser')
     
     url_ava = res_materia.url

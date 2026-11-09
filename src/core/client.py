@@ -2,6 +2,12 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
+def _request(session, method, url, **kwargs):
+    """Executa uma requisição e valida a resposta HTTP."""
+    resposta = session.request(method, url, **kwargs)
+    resposta.raise_for_status()
+    return resposta
+
 # DADOS LOGIN
 """
 dados_login_exemplo = {
@@ -18,16 +24,18 @@ def teste_login(dados_login):
     
     url_login = "https://sig.cefetmg.br/sigaa/verTelaLogin.do"
     
-    resposta = session.get(url_login) # Resposta do get da URL
+    resposta = _request(session, "get", url_login) # Resposta do get da URL
 
     soup = BeautifulSoup(resposta.text, 'html.parser') # HTML puro
 
     form_login = soup.find('form', {'name': 'loginForm'}) # Procura o primeiro elemento que eh um form loginForm
+    if not form_login or not form_login.get('action'):
+        return False
     action_url = form_login['action'] # Busca a action, o proximo caminho
 
     url_login_completa = f"https://sig.cefetmg.br{action_url}" # URL com a acao
 
-    resposta = session.post(url_login_completa, data=dados_login) # Coloca os dados do login
+    resposta = _request(session, "post", url_login_completa, data=dados_login) # Coloca os dados do login
 
     soup = BeautifulSoup(resposta.text, 'html.parser')
 
@@ -37,7 +45,7 @@ def teste_login(dados_login):
     return soup
 
 def logar(url_login, dados_login, session):
-    resposta = session.get(url_login)
+    resposta = _request(session, "get", url_login)
 
     soup = BeautifulSoup(resposta.text, 'html.parser')
 
@@ -45,11 +53,13 @@ def logar(url_login, dados_login, session):
     if not form_login:
         return False
 
+    if not form_login.get('action'):
+        return False
     action_url = form_login['action']
 
     url_login_completa = f"https://sig.cefetmg.br{action_url}"
 
-    resposta = session.post(url_login_completa, data=dados_login)
+    resposta = _request(session, "post", url_login_completa, data=dados_login)
 
     soup = BeautifulSoup(resposta.text, 'html.parser')
 
