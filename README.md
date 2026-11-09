@@ -9,7 +9,7 @@ O **SIGAA Flow** é um dashboard em Python e Streamlit que reúne informações 
 - Carga horária e nota acumulada de cada disciplina;
 - faltas registradas e estimativa de faltas restantes com base no limite de 25%;
 - tarefas futuras e seu status de envio;
-- saldo do RU em quantidade de vezes disponíveis.
+- saldo do RU em quantidade de vezes disponíveis; se o portal não apresentar o valor, o dashboard informa que está indisponível.
 
 As disciplinas podem ser consultadas em duas visualizações:
 
@@ -17,6 +17,22 @@ As disciplinas podem ser consultadas em duas visualizações:
 - **Tabela:** matéria, CH total, nota e faltas usadas em relação ao limite estimado (por exemplo, `7/8`).
 
 O app acessa o portal do SIGAA por requisições HTTP e interpreta as páginas com BeautifulSoup. Foi desenvolvido para a instância do CEFET-MG (`sig.cefetmg.br`); outras instituições podem usar estruturas HTML diferentes.
+
+## Padrões de página esperados
+
+Para que a extração funcione, as páginas do SIGAA precisam apresentar uma estrutura semelhante às imagens abaixo.
+
+### Notas e resultado da disciplina
+
+A página deve mostrar a tabela de alunos matriculados, incluindo o nome do estudante e as colunas de notas e resultado.
+
+![Padrão esperado para a página de notas do SIGAA](assets/images/padrao_notas.png)
+
+### Frequência
+
+A página deve apresentar a tabela de frequência com as colunas **Data** e **Situação**, listando as aulas e as presenças ou faltas registradas.
+
+![Padrão esperado para a página de frequência do SIGAA](assets/images/padrao_frequencia.png)
 
 ## Requisitos e execução
 

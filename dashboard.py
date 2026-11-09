@@ -95,9 +95,13 @@ try:
 
     dados = st.session_state.dados_sigaa
     nome = " ".join(dados.get("nome", "Estudante").split())
-    saldo = dados.get("saldo", "0")
+    saldo = dados.get("saldo")
     materias = dados.get("data_materias", {})
-    valor_saldo = int(saldo)
+    try:
+        valor_saldo = int(str(saldo).strip()) if saldo is not None else None
+    except (TypeError, ValueError):
+        valor_saldo = None
+    saldo_display = f"{valor_saldo} vezes" if valor_saldo is not None else "Indisponível"
 
     st.markdown(
         """
@@ -128,7 +132,9 @@ try:
     resumo1, resumo2, resumo3 = st.columns(3)
     resumo1.metric("Disciplinas", len(materias))
     resumo2.metric("Tarefas futuras", total_tarefas)
-    resumo3.metric("Saldo RU", f"{valor_saldo} vezes")
+    resumo3.metric("Saldo RU", saldo_display)
+    if valor_saldo is None:
+        st.caption("Não foi possível localizar o saldo do RU no SIGAA.")
 
     st.subheader("Acompanhamento das disciplinas")
     modo = st.radio(

@@ -9,15 +9,15 @@ def get_saldo(url_saldo, session):
 
     tabela = soup.find('tbody')
     if not tabela:
-        return '0'
+        return None
 
     dados = tabela.find_all('tr')
     if len(dados) < 3:
-        return '0'
+        return None
 
     colunas = dados[2].find_all('td')
     if len(colunas) < 2:
-        return '0'
+        return None
 
     match = re.search(r'-?\d+', colunas[1].text)
-    return match.group() if match else '0'
+    return match.group() if match else None
