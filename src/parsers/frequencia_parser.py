@@ -27,6 +27,10 @@ def get_freq(options_params, session):
     res_frequencia.raise_for_status()
     soup_frequencia = BeautifulSoup(res_frequencia.text, 'html.parser')
 
+    # Guarda a página: o próximo clique no menu (Tarefas) precisa sair do estado JSF desta tela
+    options_params["pagina_menu"] = soup_frequencia
+    options_params["url_atual"] = res_frequencia.url
+
     total_aulas = 0
     div_botoes = soup_frequencia.find('div', {'class':'botoes-show'})
     if div_botoes:
@@ -36,6 +40,7 @@ def get_freq(options_params, session):
             total_aulas = int(match.group(1))
 
     num_faltas = 0
+    registros = []
     for relacao in soup_frequencia.find_all('table', {'class':'listing'}):
         linhas = relacao.find_all('tr')
         for linha in linhas:
@@ -43,11 +48,13 @@ def get_freq(options_params, session):
 
             if len(colunas) >= 2: # colunas[0]=Data/Aula, colunas[1]=Situação
                 situacao = " ".join(colunas[1].get_text().split()).capitalize()
+                faltas_aula = 0
                 if "falta" in situacao.lower():
                     qtd_faltas = re.search(r'\d+', situacao) # Pega o primeiro inteiro na string (ex: '2 Falta(s)' -> 2)
-                    if qtd_faltas:
-                        num_faltas += int(qtd_faltas.group())
-                    else: # Quando houver apenas 'Falta'
-                        num_faltas += 1
+                    faltas_aula = int(qtd_faltas.group()) if qtd_faltas else 1 # Quando houver apenas 'Falta'
+                    num_faltas += faltas_aula
+                data_aula = " ".join(colunas[0].get_text().split())
+                if data_aula and situacao:
+                    registros.append({"data": data_aula, "situacao": situacao, "faltas": faltas_aula})
 
-    return {"total_aulas":total_aulas, "faltas":num_faltas}
+    return {"total_aulas":total_aulas, "faltas":num_faltas, "registros":registros}
