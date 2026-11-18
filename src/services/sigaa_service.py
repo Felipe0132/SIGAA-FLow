@@ -39,7 +39,11 @@ def datas_sigaa(dados_login):
         """
         data_materias.update(materia_service.get_datas_by_materia(materia, URL_DISCENTE, session, nome))
 
-    saldo = saldo_parser.get_saldo(URL_SALDO, session)
+    # O saldo fica no SIPAC, que às vezes falha sozinho; isso não deve derrubar o resto.
+    try:
+        saldo = saldo_parser.get_saldo(URL_SALDO, session)
+    except Exception:
+        saldo = None
 
     return {
             "nome":nome,

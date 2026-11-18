@@ -10,7 +10,8 @@ def get_datas_by_materia(materia, url_discente, session, nome):
     
     # PAGINAS NOTAS
     
-    notas_atual = notas_parser.get_notas(options_params, session, nome)
+    notas = notas_parser.get_notas(options_params, session, nome)
+    notas_atual = notas["total"] if notas else None
 
     # PAGINA FREQUENCIA
 
@@ -25,4 +26,11 @@ def get_datas_by_materia(materia, url_discente, session, nome):
 
     tarefas_disp = tarefas
 
-    return {options_params["nome"]:{"total_aulas":total_aulas, "total_faltas":num_faltas, "notas_atual":notas_atual, "tarefas":tarefas}}
+    return {options_params["nome"]:{
+        "total_aulas":total_aulas,
+        "total_faltas":num_faltas,
+        "notas_atual":notas_atual,
+        "notas":notas,
+        "frequencia":freq.get("registros", []),
+        "tarefas":tarefas,
+    }}
