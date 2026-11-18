@@ -1,93 +1,19 @@
-import src.core.client as client
-import requests
 import streamlit as st
 
-st.set_page_config(page_title="SIGAA Dashboard", page_icon="📚", layout="wide")
+from src.ui import componentes as ui
+from src.ui import dados
+from src.ui import paginas
+from src.ui.tema import aplicar_estilo
 
-CAMINHO_IMAGEM_NOTAS = "assets/images/padrao_notas.png"
-CAMINHO_IMAGEM_FALTAS = "assets/images/padrao_frequencia.png"
+st.set_page_config(page_title="SIGAA Flow", page_icon=":material/waves:", layout="wide")
+aplicar_estilo()
 
-@st.dialog("📋 Guia de Padrão do SIGAA")
-def exibir_modal_instrucoes():
-    st.write(
-        "Certifique-se de que a estrutura das páginas no seu SIGAA corresponde ao padrão abaixo para que o sistema extraia os dados corretamente:"
-    )
+logado = st.session_state.get("logged_in", False)
+navegacao = paginas.navegacao(logado)
 
-    st.subheader("1. Tela de Notas e Situação")
-    st.caption("Deve exibir o nome do aluno e o resultado final da disciplina.")
-    st.image(CAMINHO_IMAGEM_NOTAS, use_container_width=True)
+if logado and navegacao.url_path != "sair":
+    brutos = dados.carregar()
+    with st.sidebar:
+        st.html(f'<div class="sf">{ui.usuario(brutos.get("nome"))}</div>')
 
-    st.divider()
-
-    st.subheader("2. Tela de Diário de Classe / Frequência")
-    st.caption("Deve conter a tabela detalhada com as presenças e faltas por data.")
-    st.image(CAMINHO_IMAGEM_FALTAS, use_container_width=True)
-
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-
-if "usuario" not in st.session_state:
-    st.session_state.usuario = " "
-
-if "senha" not in st.session_state:
-    st.session_state.senha = " "
-
-def login():
-    st.title("Bem-vindo ao simplificador do SIGAA! 📚")
-    st.caption("📋 Após o login, você verá suas **notas**, **faltas** (com alerta de risco) e **saldo do RU** de todas as matérias em um só lugar — sem precisar entrar no SIGAA.")
-
-    dados_login = {
-        'user.login': st.session_state.usuario,
-        'user.senha': st.session_state.senha,
-    }
-
-    _, col_centro, _ = st.columns([1, 2, 1])
-    with col_centro:
-        with st.form("form_login"):
-            usuario = st.text_input("Usuário")
-            senha = st.text_input("Senha", type="password")
-            enviado = st.form_submit_button("Enviar", use_container_width=True)
-
-        if enviado:
-            dados_login = {'user.login': usuario, 'user.senha': senha}
-
-            with st.spinner("Verificando login..."):
-                try:
-                    if client.teste_login(dados_login):
-                        st.session_state.usuario = usuario
-                        st.session_state.senha = senha
-                        st.session_state.logged_in = True
-                        st.rerun()
-                    else:
-                        st.error("Não foi possível validar o login. Confira usuário e senha.")
-                except requests.Timeout:
-                    st.error("O SIGAA demorou para responder. Tente novamente.")
-                except requests.ConnectionError:
-                    st.error("Não foi possível conectar ao SIGAA. Verifique sua internet e tente novamente.")
-                except requests.RequestException:
-                    st.error("O SIGAA retornou uma resposta inesperada. Tente novamente mais tarde.")
-
-    st.write("")
-    if st.button("Guia", help="Ver padrao esperado do SIGAA"):
-        exibir_modal_instrucoes()
-
-def logout():
-    st.title("Sair")
-    if st.button("Encerrar sessão", type="primary"):
-        for chave in ("logged_in", "usuario", "senha", "dados_sigaa"):
-            st.session_state.pop(chave, None)
-        st.rerun()
-
-login_page = st.Page(login, title="Log in", icon=":material/login:")
-logout_page = st.Page(logout, title="Log out", icon=":material/logout:")
-
-dashboard = st.Page(
-    "dashboard.py", title="Dashboard", icon=":material/dashboard:", default=True
-)
-
-if st.session_state.logged_in:
-    pg = st.navigation([dashboard, logout_page])
-else:
-    pg = st.navigation([login_page])
-
-pg.run()
+navegacao.run()

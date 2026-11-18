@@ -1,0 +1,49 @@
+[theme]
+font = "Fira Sans:https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap"
+headingFont = "Fira Sans:https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap"
+headingFontWeights = [700, 650, 600, 600, 600, 600]
+baseFontSize = 15
+baseRadius = "10px"
+buttonRadius = "10px"
+showWidgetBorder = true
+showSidebarBorder = true
+chartCategoricalColors = ["#1F5EDB", "#1F8A55", "#B26A00", "#7C3AED", "#C7352B"]
+
+[theme.light]
+primaryColor = "#1F5EDB"
+backgroundColor = "#F4F6FA"
+secondaryBackgroundColor = "#EDF0F5"
+textColor = "#0E1626"
+borderColor = "#DCE1E9"
+linkColor = "#1A4FB8"
+greenColor = "#1F8A55"
+orangeColor = "#B26A00"
+redColor = "#C7352B"
+blueColor = "#1F5EDB"
+dataframeHeaderBackgroundColor = "#F8F9FC"
+
+[theme.light.sidebar]
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#EEF3FD"
+borderColor = "#E3E7EE"
+
+[theme.dark]
+primaryColor = "#6E9BFF"
+backgroundColor = "#0B0F17"
+secondaryBackgroundColor = "#1A2130"
+textColor = "#E7ECF4"
+borderColor = "#263042"
+linkColor = "#9DBCFF"
+greenColor = "#45C384"
+orangeColor = "#E7A43C"
+redColor = "#F2695E"
+blueColor = "#6E9BFF"
+dataframeHeaderBackgroundColor = "#161E2C"
+
+[theme.dark.sidebar]
+backgroundColor = "#0F1520"
+secondaryBackgroundColor = "#1A2333"
+borderColor = "#1F2838"
+
+[client]
+toolbarMode = "minimal"

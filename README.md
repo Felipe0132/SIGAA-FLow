@@ -58,9 +58,10 @@ As requisições aguardam o SIGAA responder, sem um limite de tempo configurado,
 ## Estrutura do projeto
 
 ```text
-├── streamlit_app.py          # Login e navegação do Streamlit
-├── dashboard.py              # Exibição dos dados acadêmicos
+├── streamlit_app.py          # Entrada: tema, sessão e navegação
+├── .streamlit/config.toml    # Tema claro/escuro, fonte e cores
 ├── src/
+│   ├── ui/                    # Telas, componentes visuais e formatação
 │   ├── core/                  # Cliente HTTP e modelos
 │   ├── parsers/               # Leitura das páginas HTML do SIGAA
 │   └── services/              # Orquestração de consultas
